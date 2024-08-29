@@ -35,6 +35,7 @@
     background-color: $c-light;
     border: 2px solid $c-light;
     z-index: -1;
+    transition: all .15s ease-in;
   }
 
   svg {
@@ -42,6 +43,7 @@
     display: block;
     width: 2.3rem;
     height: 2.2rem;
+    transition: color .15s ease-in;
   }
 
   &:hover,
@@ -89,7 +91,8 @@
   margin-top: 1.5rem;
   opacity: 0;
   pointer-events: none;
-
+  transition: opacity .15s ease-in;
+  
   @media (min-width: $stop-scaling) {
     margin-top: 15px;
   }
@@ -168,6 +171,8 @@
   color: $c-light;
   border: 2px solid transparent;
   border-radius: 50%;
+  opacity: 0;
+  transition: opacity .15s ease-in;
 
   @media (min-width: $stop-scaling) {
     width: 40px;
@@ -206,10 +211,18 @@
     @include center;
   }
 
+  .social-block--active & {
+    opacity: 1;
+  }
+
+
   &--fb {
+    transition-delay: .1s;
+  
     svg {
       width: 0.8rem;
       height: 1.7rem;
+      transition-delay: 0;
 
       @media (min-width: $stop-scaling) {
         width: 8px;
@@ -219,6 +232,8 @@
   }
 
   &--insta {
+    transition-delay: .2s;
+
     svg {
       width: 1.5rem;
       height: 1.5rem;
@@ -231,9 +246,12 @@
   }
 
   &--vk {
+    transition-delay: .3s;
+
     svg {
       width: 1.7rem;
       height: 1rem;
+
 
       @media (min-width: $stop-scaling) {
         width: 10px;

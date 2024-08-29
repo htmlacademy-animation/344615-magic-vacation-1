@@ -246,11 +246,13 @@
       content: "";
       position: absolute;
       bottom: 0;
-      width: 100%;
       height: 2px;
       background-color: $c-light;
-      display: none;
       left: 0;
+      width: 100%;
+      transform: scaleX(0);
+      transition: transform .5s ease-in;
+      transform-origin: 100% 0;
 
       @media (max-width: $tablet) and (orientation: portrait) {
         left: 0;
@@ -266,19 +268,23 @@
     }
 
     &.active {
-      &::after {
-        display: block;
+      &::after{
+       transform: scaleX(1);
       }
-    }
+    } 
 
-    &:hover,
-    &:focus {
-      color: $c-purple;
-      outline: none;
 
-      &::after {
-        opacity: 1;
-        background-color: $c-purple;
+    &:not(.active) {
+      &:hover,
+      &:focus {
+        color: $c-purple;
+        outline: none;
+
+        &::after {
+          transform: scaleX(1) ;
+          transform-origin: 0 0;
+          background-color: $c-purple;
+        }
       }
     }
   }
