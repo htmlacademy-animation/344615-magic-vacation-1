@@ -4,6 +4,7 @@
   "description": "Личный проект «Таинственный отпуск» от HTML Academy",
   "devDependencies": {
     "@htmlacademy/editorconfig-cli": "1.x",
+    "@types/swiper": "^6.0.0",
     "copy-webpack-plugin": "5.1.1",
     "css-loader": "3.5.1",
     "csso-webpack-plugin": "2.0.0-beta.1",

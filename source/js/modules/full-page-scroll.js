@@ -1,6 +1,6 @@
 import throttle from "lodash/throttle";
 
-export default class FullPageScroll {
+class FullPageScroll {
   constructor() {
     this.THROTTLE_TIMEOUT = 1000;
     this.scrollFlag = true;
@@ -103,3 +103,5 @@ export default class FullPageScroll {
     }
   }
 }
+
+export default FullPageScroll;

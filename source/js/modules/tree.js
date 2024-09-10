@@ -1,8 +1,10 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import path from "path";
+import slider from "../modules/slider";
 /**
  * дока https://threejs.org/manual/#ru/fundamentals
+ * https://threejs.org/editor/
  */
 
 const canvas = document.querySelector("#treejs");
@@ -17,13 +19,20 @@ const near = 0.1; //Усеченная форма камеры вблизи пл
 const far = 1000; //Дальняя плоскость усеченной камеры. Значение по умолчанию - 2000.
 const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 
-camera.position.z = 0.6;
-camera.position.y = 0;
-// camera.rotateY((45 * Math.PI) / 180);
-// camera.rotateX((rotateX * Math.PI) / 180);
-// camera.rotateZ((45 * Math.PI) / 180);
+camera.position.set(0, 0, 0.6);
+
+// Функция для обновления позиции камеры и направления взгляда
+function updateCameraPosition(x, y, z, lookAtX, lookAtY, lookAtZ) {
+  // Перемещаем камеру
+  camera.position.set(x, y, z);
+
+  // Указываем точку, на которую нужно смотреть
+  camera.lookAt(new THREE.Vector3(lookAtX, lookAtY, lookAtZ));
+}
 
 const scene = new THREE.Scene();
+
+let activeIndex = 0;
 
 const boxWidth = 2;
 const boxHeight = 1;
@@ -79,9 +88,8 @@ scene.add(plane3);
 scene.add(plane4);
 scene.add(plane5);
 
-// camera.position.x = 4;
 // const controls = new TrackballControls(camera, renderer.domElement);
-const controls = new OrbitControls(camera, renderer.domElement); // Управление орбитой позволяет камере вращаться вокруг цели.
+// const controls = new OrbitControls(camera, renderer.domElement); // Управление орбитой позволяет камере вращаться вокруг цели.
 
 /** HELPERS  */
 const cameraHelper = new THREE.CameraHelper(camera); // оси камеры
@@ -97,18 +105,26 @@ function render() {
 }
 
 document.body.addEventListener("screenChanged", ({ detail }) => {
-  console.log(detail);
+  if (detail.screenName !== "story") {
+    updateCameraPosition(0, 0, 0.6, 0, 0, 0);
+  } else {
+    updateCameraPosition(activeIndex + 2, 0, 0.6, activeIndex + 2, 0, 0);
+  }
+
+  slider.storySlider.on("transitionEnd", function () {
+    activeIndex = slider.storySlider.realIndex;
+    updateCameraPosition(activeIndex + 2, 0, 0.6, activeIndex + 2, 0, 0);
+  });
 });
+
+renderer.setSize(window.innerWidth, window.innerHeight);
 
 // Функция рендера (зациклена)
 (function animate() {
   console.log("animate");
   requestAnimationFrame(animate);
 
-  controls.update();
+  // controls.update();
 
   render();
 })();
-
-renderer.setSize(window.innerWidth, window.innerHeight);
-render();

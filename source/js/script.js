@@ -12,7 +12,7 @@ import "./modules/tree";
 
 // init modules
 mobileHeight();
-slider();
+slider.init();
 menu();
 footer();
 chat();
