@@ -86,7 +86,7 @@ class Slider {
   }
 
   init() {
-    window.addEventListener(`resize`, function () {
+    window.addEventListener(`resize`, () => {
       if (this.storySlider) {
         this.storySlider.destroy();
       }

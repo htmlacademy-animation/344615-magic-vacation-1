@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import path from "path";
 import slider from "../modules/slider";
+
 /**
  * дока https://threejs.org/manual/#ru/fundamentals
  * https://threejs.org/editor/
@@ -43,7 +44,14 @@ const textures = Array(5)
   .fill(null)
   .map((_, index) => {
     const texture = loader.load(
-      path.resolve(__dirname, `img/module-5/scenes-textures/scene-${index}.png`)
+      path.resolve(
+        __dirname,
+        `img/module-5/scenes-textures/scene-${index}.png`
+      ),
+      undefined,
+      (err) => {
+        console.error(`Error loading texture ${index}:, err`);
+      }
     );
 
     return texture;
@@ -53,14 +61,96 @@ const material1 = new THREE.MeshBasicMaterial({
   map: textures.at(0),
   side: THREE.DoubleSide,
 });
+
+const materialRaw1 = new THREE.RawShaderMaterial({
+  uniforms: {
+    uTexture: { type: "t", value: textures.at(0) }, // Используем первую текстуру
+  },
+  vertexShader: ` 
+    precision mediump float;
+
+    uniform mat4 modelViewMatrix; // Матрица модели-вида
+    uniform mat4 projectionMatrix; // Матрица проекции
+    uniform float hue;
+
+    attribute vec3 position; // Атрибут позиции
+    attribute vec2 uv; // Атрибут UV координат
+
+    varying vec2 vUv;
+    
+
+    void main() {
+      vUv = uv;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `,
+  fragmentShader: `
+    precision mediump float;
+    uniform sampler2D uTexture;
+    varying vec2 vUv;
+
+    void main() {
+      gl_FragColor = texture2D(uTexture, vUv);
+    }`,
+  side: THREE.DoubleSide,
+});
+
 const material2 = new THREE.MeshBasicMaterial({
   map: textures.at(1),
   side: THREE.DoubleSide,
 });
+
 const material3 = new THREE.MeshBasicMaterial({
   map: textures.at(2),
   side: THREE.DoubleSide,
 });
+
+const materialRaw3 = new THREE.RawShaderMaterial({
+  uniforms: {
+    uTexture: { type: "t", value: textures.at(2) }, // Используем первую текстуру
+    hue: { value: 0 },
+  },
+  vertexShader: ` 
+    precision mediump float;
+
+    uniform mat4 modelViewMatrix; // Матрица модели-вида
+    uniform mat4 projectionMatrix; // Матрица проекции
+    uniform float hue;
+
+    attribute vec3 position; // Атрибут позиции
+    attribute vec2 uv; // Атрибут UV координат
+
+    varying vec2 vUv;
+    
+
+    void main() {
+      vUv = uv;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `,
+  fragmentShader: `
+    precision mediump float;
+    uniform sampler2D uTexture;
+    uniform float hue; // Смещение оттенка
+    varying vec2 vUv;
+
+    void main() {
+      gl_FragColor = texture2D(uTexture, vUv);
+
+      // hue
+			float angle = hue * 3.14159265;
+			float s = sin(angle), c = cos(angle);
+			vec3 weights = (vec3(2.0 * c, -sqrt(3.0) * s - c, sqrt(3.0) * s - c) + 1.0) / 3.0;
+			float len = length(gl_FragColor.rgb);
+			gl_FragColor.rgb = vec3(
+				dot(gl_FragColor.rgb, weights.xyz),
+				dot(gl_FragColor.rgb, weights.zxy),
+				dot(gl_FragColor.rgb, weights.yzx)
+			);
+    }`,
+  side: THREE.DoubleSide,
+});
+
 const material4 = new THREE.MeshBasicMaterial({
   map: textures.at(3),
   side: THREE.DoubleSide,
@@ -71,9 +161,9 @@ const material5 = new THREE.MeshBasicMaterial({
   side: THREE.DoubleSide,
 });
 
-const plane1 = new THREE.Mesh(geometry, material1); //Полигональная сетка фигуры
+const plane1 = new THREE.Mesh(geometry, materialRaw1); //Полигональная сетка фигуры
 const plane2 = new THREE.Mesh(geometry, material2); //Полигональная сетка фигуры
-const plane3 = new THREE.Mesh(geometry, material3); //Полигональная сетка фигуры
+const plane3 = new THREE.Mesh(geometry, materialRaw3); //Полигональная сетка фигуры
 const plane4 = new THREE.Mesh(geometry, material4); //Полигональная сетка фигуры
 const plane5 = new THREE.Mesh(geometry, material5); //Полигональная сетка фигуры
 
@@ -82,14 +172,10 @@ plane3.translateX(plane2.position.x + plane2.geometry.parameters.width);
 plane4.translateX(plane3.position.x + plane3.geometry.parameters.width);
 plane5.translateX(plane4.position.x + plane4.geometry.parameters.width);
 
-scene.add(plane1);
-scene.add(plane2);
-scene.add(plane3);
-scene.add(plane4);
-scene.add(plane5);
+scene.add(plane1, plane2, plane3, plane4, plane5);
 
 // const controls = new TrackballControls(camera, renderer.domElement);
-// const controls = new OrbitControls(camera, renderer.domElement); // Управление орбитой позволяет камере вращаться вокруг цели.
+const controls = new OrbitControls(camera, renderer.domElement); // Управление орбитой позволяет камере вращаться вокруг цели.
 
 /** HELPERS  */
 const cameraHelper = new THREE.CameraHelper(camera); // оси камеры
@@ -99,6 +185,9 @@ const grid = new THREE.GridHelper(5, 25); // отражение горизонт
 const axesHelper = new THREE.AxesHelper(5); // оси координат
 scene.add(axesHelper, grid, cameraHelper, arrowHelper);
 /** END HELPERS  */
+
+// Теперь вы можете изменять значения оттенка и насыщенности
+materialRaw3.uniforms.hue.value = -0.1; // Измените оттенок
 
 function render() {
   renderer.render(scene, camera);
@@ -128,3 +217,7 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 
   render();
 })();
+
+window.addEventListener("resize", () => {
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});

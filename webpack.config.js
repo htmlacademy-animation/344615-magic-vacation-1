@@ -1,32 +1,34 @@
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const CssoWebpackPlugin = require('csso-webpack-plugin').default;
-const CopyPlugin = require('copy-webpack-plugin');
-const WriteFilePlugin = require('write-file-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const path = require('path');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const CssoWebpackPlugin = require("csso-webpack-plugin").default;
+const CopyPlugin = require("copy-webpack-plugin");
+const WriteFilePlugin = require("write-file-webpack-plugin");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const path = require("path");
 
 module.exports = {
   entry: {
     scripts: [
-      './source/js/script.js',
-      './source/scss/style.scss',
-      './source/index.html'
-    ]
+      "./source/js/script.js",
+      "./source/scss/style.scss",
+      "./source/index.html",
+    ],
   },
   resolve: {
     extensions: [".js", ".sass", ".scss", ".css"],
-    modules: ['./node_modules/'],
+    modules: ["./node_modules/"],
   },
-  mode: 'development',
+  mode: "development",
   devtool: `source-map`,
   devServer: {
-    contentBase: path.join(__dirname, 'build'),
-    port: 7777
+    contentBase: path.join(__dirname, "build"),
+    port: 7777,
+    hot: true,
+    liveReload: false,
   },
   output: {
-    path: path.join(__dirname, 'build'),
-    publicPath: '',
-    filename: 'js/script.js'
+    path: path.join(__dirname, "build"),
+    publicPath: "",
+    filename: "js/script.js",
   },
   module: {
     rules: [
@@ -40,13 +42,13 @@ module.exports = {
             loader: "css-loader",
             options: {
               sourceMap: true,
-              url: false
+              url: false,
             },
           },
           {
             loader: "sass-loader",
             options: { sourceMap: true },
-          }
+          },
         ],
       },
       {
@@ -59,7 +61,7 @@ module.exports = {
             loader: "css-loader",
             options: {
               sourceMap: true,
-              url: false
+              url: false,
             },
           },
         ],
@@ -68,61 +70,59 @@ module.exports = {
         test: /\.html$/,
         use: [
           {
-            loader: 'html-loader',
+            loader: "html-loader",
             options: {
-              attributes: false
-            }
+              attributes: false,
+            },
           },
           {
-            loader: 'posthtml-loader',
+            loader: "posthtml-loader",
             options: {
-              plugins: [
-                require('posthtml-include')({ root: 'source' })
-              ]
-            }
-          }
-        ]
-      }
-    ]
+              plugins: [require("posthtml-include")({ root: "source" })],
+            },
+          },
+        ],
+      },
+    ],
   },
   plugins: [
     new WriteFilePlugin(),
     new HtmlWebpackPlugin({
-      filename: 'index.html',
-      template: 'source/index.html',
+      filename: "index.html",
+      template: "source/index.html",
     }),
     new MiniCssExtractPlugin({
-      filename: 'css/style.min.css',
-      chunkFilename: "[id].css"
+      filename: "css/style.min.css",
+      chunkFilename: "[id].css",
     }),
     new CssoWebpackPlugin({
-      pluginOutputPostfix: 'min'
+      pluginOutputPostfix: "min",
     }),
     new CopyPlugin([
       {
         from: "source/fonts/**/*.{woff,woff2}",
-        to: path.join(__dirname, 'build', 'fonts'),
+        to: path.join(__dirname, "build", "fonts"),
         flatten: true,
       },
       {
         from: "source/img/**",
-        to: path.join(__dirname, 'build'),
+        to: path.join(__dirname, "build"),
         transformPath(targetPath) {
-          return targetPath.replace(`source${path.sep}`, '');
+          return targetPath.replace(`source${path.sep}`, "");
         },
       },
       {
         from: "source/*.ico",
-        to: path.join(__dirname, 'build'),
+        to: path.join(__dirname, "build"),
         flatten: true,
       },
       {
         from: "source/3d/**",
-        to: path.join(__dirname, 'build'),
+        to: path.join(__dirname, "build"),
         transformPath(targetPath) {
-          return targetPath.replace(`source${path.sep}`, '');
+          return targetPath.replace(`source${path.sep}`, "");
         },
-      }
+      },
     ]),
-  ]
+  ],
 };
