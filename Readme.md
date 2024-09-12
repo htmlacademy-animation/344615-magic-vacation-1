@@ -1,6 +1,5 @@
 # Личный проект «Таинственный отпуск» [![Build status][travis-image]][travis-url] [![Dependency status][dependency-image]][dependency-url]
 
-* Студент: [shuhrat](https://up.htmlacademy.ru/animation/1/user/344615).
 
 ---
 
